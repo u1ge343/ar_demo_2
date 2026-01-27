@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AR Menu Experience</title>
+<title>AR Dining Experience</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- A-Frame -->
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+<!-- AR.js -->
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+
+<!-- Animation Mixer -->
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -15,69 +20,77 @@
 body{
   margin:0;
   font-family:Inter,sans-serif;
-  background:black;
+  background:#0f0f0f;
   overflow:hidden;
 }
 
-/* Overlay */
+/* ---------- Layout ---------- */
 
-#menuOverlay{
+#ui{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(18px);
   display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-  transition:.5s;
+  z-index:5;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(18px);
 }
 
-.menuBox{
-  width:min(92%,440px);
-  background:rgba(20,20,20,.75);
-  padding:36px;
-  border-radius:22px;
+/* Left Preview */
+
+#previewPane{
+  width:50%;
+  position:relative;
 }
 
-.menuTitle{
-  text-align:center;
+#previewInfo{
+  position:absolute;
+  bottom:40px;
+  left:40px;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(12px);
+  padding:22px;
+  border-radius:18px;
   color:white;
-  font-size:26px;
-  margin-bottom:30px;
+  max-width:320px;
 }
 
-/* Cards */
+/* Right Menu */
 
-.menuCard{
-  padding:20px;
+#menuPane{
+  width:50%;
+  padding:60px 40px;
+  overflow-y:auto;
+}
+
+.menuItem{
+  padding:22px;
   border-radius:16px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,0.08);
+  margin-bottom:20px;
   cursor:pointer;
-  margin-bottom:18px;
   transition:.3s;
 }
 
-.menuCard:hover{
-  background:rgba(255,255,255,.06);
+.menuItem:hover{
+  background:rgba(255,255,255,0.06);
 }
 
-.dishName{
+/* Buttons */
+
+button{
+  padding:12px 22px;
+  border-radius:18px;
+  background:rgba(0,0,0,0.6);
+  border:1px solid rgba(255,255,255,0.15);
   color:white;
-  font-size:18px;
-  font-weight:500;
+  margin-top:16px;
 }
 
-.dishDesc{
-  font-size:13px;
-  color:#bdbdbd;
-  margin:6px 0;
-}
-
-.price{
-  color:white;
-  font-size:15px;
+#viewAR{
+  position:absolute;
+  bottom:40px;
+  right:40px;
+  z-index:10;
 }
 
 /* Order Panel */
@@ -88,144 +101,151 @@ body{
   left:50%;
   transform:translateX(-50%);
   background:rgba(0,0,0,.6);
-  backdrop-filter:blur(14px);
   padding:14px 20px;
   border-radius:18px;
   display:none;
-  align-items:center;
   gap:12px;
   color:white;
-  z-index:5;
+  z-index:10;
 }
-
 .qtyBtn{
   padding:4px 10px;
   background:#222;
   border-radius:6px;
   cursor:pointer;
 }
-
-/* Menu Button */
-
-.menuBtn{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%);
-  padding:12px 22px;
-  border-radius:18px;
-  background:rgba(0,0,0,.6);
-  border:1px solid rgba(255,255,255,.15);
-  color:white;
-  z-index:5;
-}
 </style>
 </head>
 
 <body>
 
-<!-- Overlay Menu -->
-<div id="menuOverlay">
-  <div class="menuBox">
-    <div class="menuTitle">Menu</div>
+<!-- UI -->
+<div id="ui">
 
-    <div class="menuCard" onclick="openDish('pasta','Pomodoro Pasta')">
-      <div class="dishName">Pomodoro Pasta</div>
-      <div class="dishDesc">Slow tomato sauce, basil</div>
-      <div class="price">₹299</div>
-    </div>
+<!-- LEFT PREVIEW -->
+<div id="previewPane">
+  <a-scene embedded renderer="colorManagement:true">
+    <a-assets>
+      <a-asset-item id="pastaModel" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
+      <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
+    </a-assets>
 
-    <div class="menuCard" onclick="openDish('capy','Capybara Piccata')">
-      <div class="dishName">Capybara Piccata</div>
-      <div class="dishDesc">Lemon butter garlic sauce</div>
-      <div class="price">₹399</div>
-    </div>
+    <a-entity light="type:ambient;intensity:0.7"></a-entity>
+    <a-entity light="type:directional;intensity:0.8" position="1 2 1"></a-entity>
 
+    <a-entity id="previewModel" gltf-model="#pastaModel"
+      rotation="0 0 0"
+      animation="property: rotation; to: 0 360 0; loop:true; dur:15000"
+      scale="5 5 5">
+    </a-entity>
+
+    <a-entity camera position="0 0 5"></a-entity>
+  </a-scene>
+
+  <div id="previewInfo">
+    <h2 id="previewName">Pomodoro Pasta</h2>
+    <p id="previewDesc">Slow tomato sauce, basil</p>
+    <p id="previewPrice">₹299</p>
   </div>
 </div>
 
-<!-- Order Panel -->
+<!-- RIGHT MENU -->
+<div id="menuPane">
+
+  <div class="menuItem" onclick="selectDish('pasta')">
+    Pomodoro Pasta — ₹299
+  </div>
+
+  <div class="menuItem" onclick="selectDish('capy')">
+    Capybara Piccata — ₹399
+  </div>
+
+</div>
+
+<button id="viewAR" onclick="openAR()">View in AR</button>
+
+</div>
+
+<!-- ORDER PANEL -->
 <div id="orderPanel">
-  <span id="dishName"></span>
+  <span id="dishLabel"></span>
   <div class="qtyBtn" onclick="changeQty(-1)">-</div>
   <span id="qty">1</span>
   <div class="qtyBtn" onclick="changeQty(1)">+</div>
   <div class="qtyBtn" onclick="confirmOrder()">Order</div>
 </div>
 
-<button class="menuBtn" onclick="showMenu()">Menu</button>
-
-<!-- AR Scene -->
-<a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
+<!-- AR SCENE -->
+<a-scene id="arScene" style="display:none"
+ embedded
+ arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
-  <a-asset-item id="pastaModel"
-    src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
-  <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
+  <a-asset-item id="pastaAR" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
+  <a-asset-item id="capyAR" src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
-<!-- Lighting -->
 <a-entity light="type:ambient;intensity:.4"></a-entity>
 <a-entity light="type:directional;intensity:.6" position="1 2 1"></a-entity>
 
-<!-- Marker -->
 <a-marker preset="hiro">
-
-  <a-entity id="pasta"
-    gltf-model="#pastaModel"
-    scale="8 8 8"
-    visible="false"></a-entity>
-
-  <a-entity id="capy"
-    gltf-model="#capyModel"
-    animation-mixer="loop:repeat"
-    scale="5 5 5"
-    visible="false"></a-entity>
-
+  <a-entity id="pastaARModel" gltf-model="#pastaAR" scale="8 8 8" visible="false"></a-entity>
+  <a-entity id="capyARModel" gltf-model="#capyAR" animation-mixer scale="5 5 5" visible="false"></a-entity>
 </a-marker>
 
 <a-entity camera></a-entity>
 </a-scene>
 
 <script>
-const overlay=document.getElementById("menuOverlay");
-const pasta=document.getElementById("pasta");
-const capy=document.getElementById("capy");
-const panel=document.getElementById("orderPanel");
-const dishLabel=document.getElementById("dishName");
-const qtyText=document.getElementById("qty");
+let current="pasta", qty=1;
 
-let qty=1;
-let currentDish="";
+const preview=document.getElementById("previewModel");
+const nameEl=document.getElementById("previewName");
+const descEl=document.getElementById("previewDesc");
+const priceEl=document.getElementById("previewPrice");
 
-function openDish(type,name){
-  overlay.style.display="none";
+const pastaAR=document.getElementById("pastaARModel");
+const capyAR=document.getElementById("capyARModel");
 
-  pasta.setAttribute("visible","false");
-  capy.setAttribute("visible","false");
+function selectDish(type){
+current=type;
 
-  if(type==="pasta") pasta.setAttribute("visible","true");
-  if(type==="capy") capy.setAttribute("visible","true");
+if(type==="pasta"){
+preview.setAttribute("gltf-model","#pastaModel");
+nameEl.textContent="Pomodoro Pasta";
+descEl.textContent="Slow tomato sauce, basil";
+priceEl.textContent="₹299";
+}
 
-  currentDish=name;
-  dishLabel.textContent=name+" | Table 4";
-  qty=1;
-  qtyText.textContent=1;
-  panel.style.display="flex";
+if(type==="capy"){
+preview.setAttribute("gltf-model","#capyModel");
+nameEl.textContent="Capybara Piccata";
+descEl.textContent="Lemon butter garlic sauce";
+priceEl.textContent="₹399";
+}
+}
+
+function openAR(){
+document.getElementById("ui").style.display="none";
+document.getElementById("arScene").style.display="block";
+
+pastaAR.setAttribute("visible","false");
+capyAR.setAttribute("visible","false");
+
+if(current==="pasta") pastaAR.setAttribute("visible","true");
+if(current==="capy") capyAR.setAttribute("visible","true");
+
+document.getElementById("orderPanel").style.display="flex";
+document.getElementById("dishLabel").textContent=(current==="pasta"?"Pomodoro Pasta":"Capybara Piccata")+" | Table 4";
 }
 
 function changeQty(v){
-  qty=Math.max(1,qty+v);
-  qtyText.textContent=qty;
+qty=Math.max(1,qty+v);
+document.getElementById("qty").textContent=qty;
 }
 
 function confirmOrder(){
-  alert("Order Sent (Demo)\n"+currentDish+"\nQuantity: "+qty+"\nTable: 4");
-}
-
-function showMenu(){
-  overlay.style.display="flex";
-  panel.style.display="none";
+alert("Order Sent (Demo)\n"+current+"\nQty:"+qty+"\nTable:4");
 }
 </script>
 
