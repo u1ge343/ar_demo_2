@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AR Restaurant Menu</title>
+<title>AR Menu Experience</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- A-Frame -->
@@ -14,52 +14,90 @@
 <!-- Animation Mixer -->
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-body {
+body{
   margin:0;
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   overflow:hidden;
+  background:black;
 }
 
-/* Overlay Menu */
+/* ---------- Overlay ---------- */
+
 #menuOverlay{
   position:fixed;
   inset:0;
-  background:#0e0e0e;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter: blur(18px);
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:20px;
   z-index:10;
-  color:white;
+  transition:opacity .6s ease;
 }
 
-.menuCard{
-  width:260px;
-  padding:20px;
-  background:#1a1a1a;
-  border-radius:12px;
+.menuContainer{
+  width:min(90%,420px);
+  background:rgba(20,20,20,0.75);
+  border-radius:22px;
+  padding:40px 32px;
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+}
+
+.menuTitle{
   text-align:center;
+  font-size:28px;
+  font-weight:500;
+  color:#fff;
+  margin-bottom:32px;
+  letter-spacing:.5px;
+}
+
+/* ---------- Cards ---------- */
+
+.menuCard{
+  padding:22px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.08);
+  margin-bottom:18px;
   cursor:pointer;
-  transition:0.3s;
+  transition:.35s ease;
+  background:rgba(255,255,255,0.02);
 }
 
 .menuCard:hover{
-  transform:scale(1.05);
-  background:#242424;
+  background:rgba(255,255,255,0.06);
+  transform:translateY(-2px);
 }
+
+.dishName{
+  font-size:18px;
+  font-weight:500;
+  color:white;
+}
+
+.dishDesc{
+  font-size:13px;
+  margin-top:6px;
+  color:#b5b5b5;
+}
+
+/* ---------- Menu Button ---------- */
 
 .menuBtn{
   position:fixed;
-  bottom:20px;
+  bottom:22px;
   left:50%;
   transform:translateX(-50%);
-  padding:12px 18px;
-  background:black;
+  padding:12px 22px;
+  border-radius:20px;
+  background:rgba(0,0,0,0.6);
   color:white;
-  border:none;
-  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(12px);
+  font-size:14px;
   z-index:5;
 }
 </style>
@@ -67,38 +105,37 @@ body {
 
 <body>
 
-<!-- Overlay Menu -->
+<!-- Overlay -->
 <div id="menuOverlay">
-  <h1>AR Menu</h1>
+  <div class="menuContainer">
+    <div class="menuTitle">Menu</div>
 
-  <div class="menuCard" onclick="openDish('pasta')">
-    🍝 Pomodoro Pasta
-  </div>
+    <div class="menuCard" onclick="openDish('pasta')">
+      <div class="dishName">Pomodoro Pasta</div>
+      <div class="dishDesc">Slow-cooked tomato sauce, basil, olive oil</div>
+    </div>
 
-  <div class="menuCard" onclick="openDish('capybara')">
-    🐹 Capybara Piccata
+    <div class="menuCard" onclick="openDish('capy')">
+      <div class="dishName">Capybara Piccata</div>
+      <div class="dishDesc">Lemon butter sauce, herbs, garlic</div>
+    </div>
+
   </div>
 </div>
 
-<button class="menuBtn" onclick="showMenu()">☰ Menu</button>
+<button class="menuBtn" onclick="showMenu()">Menu</button>
 
 <!-- AR Scene -->
-<a-scene
-  embedded
-  arjs="sourceType:webcam; debugUIEnabled:false;"
-  vr-mode-ui="enabled:false">
+<a-scene embedded arjs="sourceType:webcam; debugUIEnabled:false;" vr-mode-ui="enabled:false">
 
   <a-assets>
     <a-asset-item id="pastaModel"
-      src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb">
-    </a-asset-item>
+      src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
 
-    <a-asset-item id="capyModel"
-      src="assets/jb.glb">
-    </a-asset-item>
+    <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
   </a-assets>
 
-  <!-- Soft Lights -->
+  <!-- Lighting -->
   <a-entity light="type:ambient; intensity:0.4"></a-entity>
   <a-entity light="type:directional; intensity:0.6" position="1 2 1"></a-entity>
   <a-entity light="type:directional; intensity:0.3" position="-1 1 1"></a-entity>
@@ -106,22 +143,16 @@ body {
   <!-- Marker -->
   <a-marker preset="hiro">
 
-    <!-- Pomodoro -->
-    <a-entity
-      id="pasta"
+    <a-entity id="pasta"
       gltf-model="#pastaModel"
       scale="8 8 8"
-      visible="false">
-    </a-entity>
+      visible="false"></a-entity>
 
-    <!-- Capybara -->
-    <a-entity
-      id="capybara"
+    <a-entity id="capy"
       gltf-model="#capyModel"
-      scale="5 5 5"
       animation-mixer="loop:repeat"
-      visible="false">
-    </a-entity>
+      scale="5 5 5"
+      visible="false"></a-entity>
 
   </a-marker>
 
@@ -131,25 +162,22 @@ body {
 <script>
 const overlay = document.getElementById("menuOverlay");
 const pasta = document.getElementById("pasta");
-const capy = document.getElementById("capybara");
+const capy = document.getElementById("capy");
 
 function openDish(type){
-  overlay.style.display="none";
+  overlay.style.opacity="0";
+  setTimeout(()=>overlay.style.display="none",500);
 
   pasta.setAttribute("visible","false");
   capy.setAttribute("visible","false");
 
-  if(type==="pasta"){
-    pasta.setAttribute("visible","true");
-  }
-
-  if(type==="capybara"){
-    capy.setAttribute("visible","true");
-  }
+  if(type==="pasta") pasta.setAttribute("visible","true");
+  if(type==="capy") capy.setAttribute("visible","true");
 }
 
 function showMenu(){
   overlay.style.display="flex";
+  setTimeout(()=>overlay.style.opacity="1",10);
 }
 </script>
 
