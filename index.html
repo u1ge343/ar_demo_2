@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AR.js Hiro Marker – Lighting Locked</title>
+  <title>AR.js Hiro Marker – Animated Model (Lighting Locked)</title>
 
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
@@ -29,16 +29,17 @@
 
   <!-- Assets -->
   <a-assets>
-    <a-asset-item id="model" src="assets/pol.glb"></a-asset-item>
+    <a-asset-item id="model" src="assets/jb.glb"></a-asset-item>
   </a-assets>
 
   <!-- Hiro Marker -->
   <a-marker preset="hiro">
 
-    <!-- 3D Model -->
+    <!-- Animated 3D Model -->
     <a-entity
       id="modelEntity"
       gltf-model="#model"
+      animation-mixer="loop: repeat"
       position="0 0 0"
       scale="5 5 5">
     </a-entity>
@@ -54,6 +55,7 @@
   const modelEl = document.getElementById("modelEntity");
 
   modelEl.addEventListener("model-loaded", () => {
+
     const mesh = modelEl.getObject3D("mesh");
 
     if (!mesh) {
@@ -63,6 +65,7 @@
 
     mesh.traverse((node) => {
       if (node.isMesh) {
+
         const oldMat = node.material;
 
         node.material = new THREE.MeshBasicMaterial({
@@ -71,10 +74,11 @@
         });
 
         node.material.needsUpdate = true;
+
       }
     });
 
-    console.log("Lighting fully disabled. Brightness locked.");
+    console.log("Lighting disabled. Animation playing.");
   });
 </script>
 
