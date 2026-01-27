@@ -1,79 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AR.js Hiro Marker – Soft Lighting + Animation</title>
+<meta charset="UTF-8">
+<title>AR Restaurant Menu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- A-Frame -->
-  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+<!-- A-Frame -->
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-  <!-- AR.js -->
-  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+<!-- AR.js -->
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 
-  <!-- Animation Mixer -->
-  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+<!-- Animation Mixer -->
+<script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-  </style>
+<style>
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  overflow:hidden;
+}
+
+/* Overlay Menu */
+#menuOverlay{
+  position:fixed;
+  inset:0;
+  background:#0e0e0e;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  z-index:10;
+  color:white;
+}
+
+.menuCard{
+  width:260px;
+  padding:20px;
+  background:#1a1a1a;
+  border-radius:12px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.menuCard:hover{
+  transform:scale(1.05);
+  background:#242424;
+}
+
+.menuBtn{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:12px 18px;
+  background:black;
+  color:white;
+  border:none;
+  border-radius:8px;
+  z-index:5;
+}
+</style>
 </head>
 
 <body>
 
+<!-- Overlay Menu -->
+<div id="menuOverlay">
+  <h1>AR Menu</h1>
+
+  <div class="menuCard" onclick="openDish('pasta')">
+    🍝 Pomodoro Pasta
+  </div>
+
+  <div class="menuCard" onclick="openDish('capybara')">
+    🐹 Capybara Piccata
+  </div>
+</div>
+
+<button class="menuBtn" onclick="showMenu()">☰ Menu</button>
+
+<!-- AR Scene -->
 <a-scene
   embedded
-  arjs="sourceType: webcam; debugUIEnabled: false;"
-  vr-mode-ui="enabled: false"
-  renderer="colorManagement: true;"
->
+  arjs="sourceType:webcam; debugUIEnabled:false;"
+  vr-mode-ui="enabled:false">
 
-  <!-- Assets -->
   <a-assets>
-    <a-asset-item id="model" src="assets/jb.glb"></a-asset-item>
+    <a-asset-item id="pastaModel"
+      src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb">
+    </a-asset-item>
+
+    <a-asset-item id="capyModel"
+      src="assets/jb.glb">
+    </a-asset-item>
   </a-assets>
 
-  <!-- Soft Ambient Base -->
-  <a-entity light="type: ambient; intensity: 0.4"></a-entity>
+  <!-- Soft Lights -->
+  <a-entity light="type:ambient; intensity:0.4"></a-entity>
+  <a-entity light="type:directional; intensity:0.6" position="1 2 1"></a-entity>
+  <a-entity light="type:directional; intensity:0.3" position="-1 1 1"></a-entity>
 
-  <!-- Main Key Light -->
-  <a-entity
-    light="type: directional; intensity: 0.6"
-    position="1 2 1">
-  </a-entity>
-
-  <!-- Soft Fill Light -->
-  <a-entity
-    light="type: directional; intensity: 0.3"
-    position="-1 1 1">
-  </a-entity>
-
-  <!-- Back Rim Light -->
-  <a-entity
-    light="type: directional; intensity: 0.2"
-    position="0 2 -2">
-  </a-entity>
-
-  <!-- Hiro Marker -->
+  <!-- Marker -->
   <a-marker preset="hiro">
 
-    <!-- Animated Model -->
+    <!-- Pomodoro -->
     <a-entity
-      id="modelEntity"
-      gltf-model="#model"
-      animation-mixer="loop: repeat"
-      position="0 0 0"
-      scale="5 5 5">
+      id="pasta"
+      gltf-model="#pastaModel"
+      scale="8 8 8"
+      visible="false">
+    </a-entity>
+
+    <!-- Capybara -->
+    <a-entity
+      id="capybara"
+      gltf-model="#capyModel"
+      scale="5 5 5"
+      animation-mixer="loop:repeat"
+      visible="false">
     </a-entity>
 
   </a-marker>
 
-  <!-- Camera -->
   <a-entity camera></a-entity>
-
 </a-scene>
+
+<script>
+const overlay = document.getElementById("menuOverlay");
+const pasta = document.getElementById("pasta");
+const capy = document.getElementById("capybara");
+
+function openDish(type){
+  overlay.style.display="none";
+
+  pasta.setAttribute("visible","false");
+  capy.setAttribute("visible","false");
+
+  if(type==="pasta"){
+    pasta.setAttribute("visible","true");
+  }
+
+  if(type==="capybara"){
+    capy.setAttribute("visible","true");
+  }
+}
+
+function showMenu(){
+  overlay.style.display="flex";
+}
+</script>
 
 </body>
 </html>
