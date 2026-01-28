@@ -7,180 +7,204 @@
 
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
 body{
-  margin:0;
-  font-family:Inter,sans-serif;
-  background:black;
-  overflow:hidden;
+ margin:0;
+ font-family:Inter,sans-serif;
+ background:black;
+ overflow:hidden;
 }
 
-/* Overlay */
+/* LOADER */
+#loader{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.85);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:white;
+ font-size:18px;
+ z-index:20;
+ display:none;
+}
 
+/* CART BADGE */
+#cartBadge{
+ position:fixed;
+ top:20px;
+ right:20px;
+ background:#ff5252;
+ color:white;
+ padding:8px 14px;
+ border-radius:20px;
+ font-size:13px;
+ z-index:6;
+ cursor:pointer;
+}
+
+/* MENU OVERLAY */
 #menuOverlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(18px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-  transition:.5s;
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.6);
+ backdrop-filter:blur(18px);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ z-index:10;
 }
 
 .menuBox{
-  width:min(92%,440px);
-  background:rgba(20,20,20,.75);
-  padding:36px;
-  border-radius:22px;
+ width:min(92%,420px);
+ background:rgba(25,25,25,.9);
+ padding:32px;
+ border-radius:22px;
 }
 
-.menuTitle{
-  text-align:center;
-  color:white;
-  font-size:26px;
-  margin-bottom:30px;
-}
-
-/* Cards */
-
+/* CARDS */
 .menuCard{
-  padding:20px;
-  border-radius:16px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.08);
-  cursor:pointer;
-  margin-bottom:18px;
-  transition:.3s;
+ padding:18px;
+ border-radius:14px;
+ background:rgba(255,255,255,.06);
+ border:1px solid rgba(255,255,255,.12);
+ margin-bottom:14px;
+ cursor:pointer;
 }
 
-.menuCard:hover{
-  background:rgba(255,255,255,.06);
+.dishName{color:white;font-size:18px}
+.dishDesc{color:#e0e0e0;font-size:13px}
+.price{color:#ffd36b}
+
+/* BOTTOM BAR */
+#bottomBar{
+ position:fixed;
+ bottom:20px;
+ left:50%;
+ transform:translateX(-50%);
+ background:rgba(0,0,0,.65);
+ padding:14px 18px;
+ border-radius:18px;
+ display:flex;
+ gap:14px;
+ align-items:center;
+ color:white;
+ z-index:5;
 }
 
-.dishName{
-  color:white;
-  font-size:18px;
-  font-weight:500;
+.btn{
+ padding:6px 14px;
+ background:#222;
+ border-radius:8px;
+ cursor:pointer;
 }
 
-.dishDesc{
-  font-size:13px;
-  color:#bdbdbd;
-  margin:6px 0;
+/* ORDER SUMMARY */
+#summaryModal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.7);
+ display:none;
+ align-items:center;
+ justify-content:center;
+ z-index:30;
 }
 
-.price{
-  color:white;
-  font-size:15px;
+.summaryBox{
+ background:#1a1a1a;
+ width:min(90%,380px);
+ padding:24px;
+ border-radius:22px;
+ color:white;
 }
 
-/* Order Panel */
-
-#orderPanel{
-  position:fixed;
-  bottom:90px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(14px);
-  padding:14px 20px;
-  border-radius:18px;
-  display:none;
-  align-items:center;
-  gap:12px;
-  color:white;
-  z-index:5;
+.summaryItem{
+ display:flex;
+ justify-content:space-between;
+ margin:10px 0;
 }
 
-.qtyBtn{
-  padding:4px 10px;
-  background:#222;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-/* Menu Button */
-
-.menuBtn{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%);
-  padding:12px 22px;
-  border-radius:18px;
-  background:rgba(0,0,0,.6);
-  border:1px solid rgba(255,255,255,.15);
-  color:white;
-  z-index:5;
+/* CLOSE BTN */
+.closeBtn{
+ text-align:center;
+ margin-top:16px;
+ padding:10px;
+ background:#333;
+ border-radius:10px;
+ cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Overlay Menu -->
+<div id="loader">Loading 3D Model...</div>
+
+<div id="cartBadge" onclick="openSummary()">Cart: <span id="cartCount">0</span></div>
+
+<!-- MENU -->
 <div id="menuOverlay">
-  <div class="menuBox">
-    <div class="menuTitle">Menu</div>
-
-    <div class="menuCard" onclick="openDish('pasta','Pomodoro Pasta')">
-      <div class="dishName">Pomodoro Pasta</div>
-      <div class="dishDesc">Slow tomato sauce, basil</div>
-      <div class="price">₹299</div>
-    </div>
-
-    <div class="menuCard" onclick="openDish('capy','Capybara Piccata')">
-      <div class="dishName">Capybara Piccata</div>
-      <div class="dishDesc">Lemon butter garlic sauce</div>
-      <div class="price">₹399</div>
-    </div>
-
+ <div class="menuBox">
+  <div class="menuCard" onclick="selectDish(0)">
+   <div class="dishName">Pomodoro Pasta</div>
+   <div class="dishDesc">Slow tomato sauce, basil</div>
+   <div class="price">₹299</div>
   </div>
+
+  <div class="menuCard" onclick="selectDish(1)">
+   <div class="dishName">Capybara Piccata</div>
+   <div class="dishDesc">Lemon butter garlic sauce</div>
+   <div class="price">₹399</div>
+  </div>
+ </div>
 </div>
 
-<!-- Order Panel -->
-<div id="orderPanel">
-  <span id="dishName"></span>
-  <div class="qtyBtn" onclick="changeQty(-1)">-</div>
-  <span id="qty">1</span>
-  <div class="qtyBtn" onclick="changeQty(1)">+</div>
-  <div class="qtyBtn" onclick="confirmOrder()">Order</div>
+<!-- BOTTOM BAR -->
+<div id="bottomBar" style="display:none;">
+ <div class="btn" onclick="prevDish()">◀</div>
+ <div id="dishLabel">Dish</div>
+ <div class="btn" onclick="nextDish()">▶</div>
+ <div class="btn" onclick="addToCart()">Add</div>
 </div>
 
-<button class="menuBtn" onclick="showMenu()">Menu</button>
+<!-- SUMMARY -->
+<div id="summaryModal">
+ <div class="summaryBox">
+  <h3>Order Summary</h3>
+  <div id="summaryList"></div>
+  <div class="closeBtn" onclick="closeSummary()">Close</div>
+ </div>
+</div>
 
-<!-- AR Scene -->
+<!-- AR -->
 <a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
-  <a-asset-item id="pastaModel"
-    src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
-  <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
+ <a-asset-item id="pastaModel" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
+ <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
-<!-- Lighting -->
-<a-entity light="type:ambient;intensity:.4"></a-entity>
-<a-entity light="type:directional;intensity:.6" position="1 2 1"></a-entity>
+<a-entity light="type:ambient;intensity:.5"></a-entity>
+<a-entity light="type:directional;intensity:1" position="0 3 2"></a-entity>
 
-<!-- Marker -->
 <a-marker preset="hiro">
 
-  <a-entity id="pasta"
-    gltf-model="#pastaModel"
-    scale="8 8 8"
-    visible="false"></a-entity>
+ <!-- SHADOW -->
+ <a-plane rotation="-90 0 0" width="3" height="3"
+  material="color:#000;opacity:0.35"></a-plane>
 
-  <a-entity id="capy"
-    gltf-model="#capyModel"
-    animation-mixer="loop:repeat"
-    scale="5 5 5"
-    visible="false"></a-entity>
+ <!-- ROTATING HOLDER -->
+ <a-entity id="holder"
+  position="0 0.6 0"
+  animation="property:rotation;to:0 360 0;loop:true;dur:15000">
+
+  <a-entity id="pasta" gltf-model="#pastaModel" scale="8 8 8" visible="false"></a-entity>
+  <a-entity id="capy" gltf-model="#capyModel" scale="5 5 5" visible="false"></a-entity>
+
+ </a-entity>
 
 </a-marker>
 
@@ -188,44 +212,87 @@ body{
 </a-scene>
 
 <script>
+const dishes=[
+ {name:"Pomodoro Pasta", price:299, id:"pasta"},
+ {name:"Capybara Piccata", price:399, id:"capy"}
+];
+
+let currentIndex=0;
+let cart=[];
+
 const overlay=document.getElementById("menuOverlay");
-const pasta=document.getElementById("pasta");
-const capy=document.getElementById("capy");
-const panel=document.getElementById("orderPanel");
-const dishLabel=document.getElementById("dishName");
-const qtyText=document.getElementById("qty");
+const loader=document.getElementById("loader");
+const bottomBar=document.getElementById("bottomBar");
+const dishLabel=document.getElementById("dishLabel");
+const cartCount=document.getElementById("cartCount");
+const summaryList=document.getElementById("summaryList");
 
-let qty=1;
-let currentDish="";
-
-function openDish(type,name){
-  overlay.style.display="none";
-
-  pasta.setAttribute("visible","false");
-  capy.setAttribute("visible","false");
-
-  if(type==="pasta") pasta.setAttribute("visible","true");
-  if(type==="capy") capy.setAttribute("visible","true");
-
-  currentDish=name;
-  dishLabel.textContent=name+" | Table 4";
-  qty=1;
-  qtyText.textContent=1;
-  panel.style.display="flex";
+function hideAll(){
+ dishes.forEach(d=>{
+  document.getElementById(d.id).setAttribute("visible","false");
+ });
 }
 
-function changeQty(v){
-  qty=Math.max(1,qty+v);
-  qtyText.textContent=qty;
+function showDish(i){
+ loader.style.display="flex";
+ hideAll();
+ currentIndex=i;
+ setTimeout(()=>{
+  document.getElementById(dishes[i].id).setAttribute("visible","true");
+  dishLabel.textContent=dishes[i].name;
+  loader.style.display="none";
+ },600);
 }
 
-function confirmOrder(){
-  alert("Order Sent (Demo)\n"+currentDish+"\nQuantity: "+qty+"\nTable: 4");
+function selectDish(i){
+ overlay.style.display="none";
+ bottomBar.style.display="flex";
+ showDish(i);
 }
 
-function showMenu(){
-  overlay.style.display="flex";
-  panel.style.display="none";
+function prevDish(){
+ let i=currentIndex-1;
+ if(i<0) i=dishes.length-1;
+ showDish(i);
+}
+
+function nextDish(){
+ let i=currentIndex+1;
+ if(i>=dishes.length) i=0;
+ showDish(i);
+}
+
+function addToCart(){
+ cart.push(dishes[currentIndex]);
+ cartCount.textContent=cart.length;
+ alert("Added to cart");
+}
+
+function openSummary(){
+ summaryList.innerHTML="";
+ let total=0;
+
+ cart.forEach(item=>{
+  summaryList.innerHTML+=`
+   <div class="summaryItem">
+    <span>${item.name}</span>
+    <span>₹${item.price}</span>
+   </div>`;
+  total+=item.price;
+ });
+
+ summaryList.innerHTML+=`
+ <hr>
+ <div class="summaryItem">
+  <strong>Total</strong>
+  <strong>₹${total}</strong>
+ </div>`;
+
+ document.getElementById("summaryModal").style.display="flex";
+}
+
+function closeSummary(){
+ document.getElementById("summaryModal").style.display="none";
 }
 </script>
 
