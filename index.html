@@ -5,8 +5,14 @@
 <title>AR Menu Experience</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- AFRAME -->
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+<!-- AR.JS -->
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+
+<!-- REQUIRED FOR ANIMATION-MIXER -->
+<script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -31,19 +37,6 @@ body{
  display:none;
 }
 
-#cartBadge{
- position:fixed;
- top:20px;
- right:20px;
- background:#ff5252;
- color:white;
- padding:8px 14px;
- border-radius:20px;
- font-size:13px;
- z-index:6;
- cursor:pointer;
-}
-
 #menuOverlay{
  position:fixed;
  inset:0;
@@ -57,22 +50,21 @@ body{
 
 .menuBox{
  width:min(92%,420px);
- background:rgba(25,25,25,.9);
- padding:32px;
+ background:#1e1e1e;
+ padding:30px;
  border-radius:22px;
 }
 
 .menuCard{
  padding:18px;
+ background:#2a2a2a;
  border-radius:14px;
- background:rgba(255,255,255,.06);
- border:1px solid rgba(255,255,255,.12);
  margin-bottom:14px;
  cursor:pointer;
 }
 
 .dishName{color:white;font-size:18px}
-.dishDesc{color:#e0e0e0;font-size:13px}
+.dishDesc{color:#ccc;font-size:13px}
 .price{color:#ffd36b}
 
 #bottomBar{
@@ -80,53 +72,19 @@ body{
  bottom:20px;
  left:50%;
  transform:translateX(-50%);
- background:rgba(0,0,0,.65);
+ background:#000000aa;
  padding:14px 18px;
  border-radius:18px;
  display:flex;
  gap:14px;
- align-items:center;
  color:white;
  z-index:5;
 }
 
 .btn{
  padding:6px 14px;
- background:#222;
- border-radius:8px;
- cursor:pointer;
-}
-
-#summaryModal{
- position:fixed;
- inset:0;
- background:rgba(0,0,0,.7);
- display:none;
- align-items:center;
- justify-content:center;
- z-index:30;
-}
-
-.summaryBox{
- background:#1a1a1a;
- width:min(90%,380px);
- padding:24px;
- border-radius:22px;
- color:white;
-}
-
-.summaryItem{
- display:flex;
- justify-content:space-between;
- margin:10px 0;
-}
-
-.closeBtn{
- text-align:center;
- margin-top:16px;
- padding:10px;
  background:#333;
- border-radius:10px;
+ border-radius:8px;
  cursor:pointer;
 }
 </style>
@@ -136,11 +94,10 @@ body{
 
 <div id="loader">Loading 3D Model...</div>
 
-<div id="cartBadge" onclick="openSummary()">Cart: <span id="cartCount">0</span></div>
-
 <!-- MENU -->
 <div id="menuOverlay">
  <div class="menuBox">
+
   <div class="menuCard" onclick="selectDish(0)">
    <div class="dishName">Pomodoro Pasta</div>
    <div class="dishDesc">Slow tomato sauce, basil</div>
@@ -152,27 +109,18 @@ body{
    <div class="dishDesc">Lemon butter garlic sauce</div>
    <div class="price">₹399</div>
   </div>
+
  </div>
 </div>
 
-<!-- BOTTOM BAR -->
+<!-- CONTROLS -->
 <div id="bottomBar" style="display:none;">
  <div class="btn" onclick="prevDish()">◀</div>
  <div id="dishLabel">Dish</div>
  <div class="btn" onclick="nextDish()">▶</div>
- <div class="btn" onclick="addToCart()">Add</div>
 </div>
 
-<!-- SUMMARY -->
-<div id="summaryModal">
- <div class="summaryBox">
-  <h3>Order Summary</h3>
-  <div id="summaryList"></div>
-  <div class="closeBtn" onclick="closeSummary()">Close</div>
- </div>
-</div>
-
-<!-- AR SCENE -->
+<!-- AR -->
 <a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
@@ -183,16 +131,17 @@ body{
   src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
-<a-entity light="type:ambient;intensity:.5"></a-entity>
+<!-- LIGHT -->
+<a-entity light="type:ambient;intensity:0.6"></a-entity>
 <a-entity light="type:directional;intensity:1" position="0 3 2"></a-entity>
 
 <a-marker preset="hiro">
 
  <!-- SHADOW -->
  <a-plane rotation="-90 0 0" width="3" height="3"
- material="color:#000;opacity:0.35"></a-plane>
+  material="color:#000;opacity:0.35"></a-plane>
 
- <!-- PASTA ROTATOR -->
+ <!-- PASTA (ROTATES) -->
  <a-entity id="pastaHolder"
   position="0 0.6 0"
   animation="property:rotation;to:0 360 0;loop:true;dur:15000">
@@ -204,12 +153,12 @@ body{
 
  </a-entity>
 
- <!-- CAPY (NO ROTATION) -->
+ <!-- CAPY (ANIMATES, NO ROTATION) -->
  <a-entity id="capyHolder" position="0 0.6 0">
 
   <a-entity id="capy"
    gltf-model="#capyModel"
-   animation-mixer="loop: repeat"
+   animation-mixer="clip:*; loop:repeat"
    scale="5 5 5"
    visible="false"></a-entity>
 
@@ -222,19 +171,16 @@ body{
 
 <script>
 const dishes=[
- {name:"Pomodoro Pasta", price:299, id:"pasta"},
- {name:"Capybara Piccata", price:399, id:"capy"}
+ {name:"Pomodoro Pasta", id:"pasta"},
+ {name:"Capybara Piccata", id:"capy"}
 ];
 
 let currentIndex=0;
-let cart=[];
 
 const overlay=document.getElementById("menuOverlay");
 const loader=document.getElementById("loader");
 const bottomBar=document.getElementById("bottomBar");
 const dishLabel=document.getElementById("dishLabel");
-const cartCount=document.getElementById("cartCount");
-const summaryList=document.getElementById("summaryList");
 
 function hideAll(){
  document.getElementById("pasta").setAttribute("visible","false");
@@ -252,7 +198,7 @@ function showDish(i){
    loader.style.display="none";
 
    if(model.hasAttribute("animation-mixer")){
-    model.components["animation-mixer"].play();
+     model.components["animation-mixer"].play();
    }
  },{once:true});
 
@@ -276,39 +222,6 @@ function nextDish(){
  let i=currentIndex+1;
  if(i>=dishes.length) i=0;
  showDish(i);
-}
-
-function addToCart(){
- cart.push(dishes[currentIndex]);
- cartCount.textContent=cart.length;
- alert("Added to cart");
-}
-
-function openSummary(){
- summaryList.innerHTML="";
- let total=0;
-
- cart.forEach(item=>{
-  summaryList.innerHTML+=`
-   <div class="summaryItem">
-    <span>${item.name}</span>
-    <span>₹${item.price}</span>
-   </div>`;
-  total+=item.price;
- });
-
- summaryList.innerHTML+=`
- <hr>
- <div class="summaryItem">
-  <strong>Total</strong>
-  <strong>₹${total}</strong>
- </div>`;
-
- document.getElementById("summaryModal").style.display="flex";
-}
-
-function closeSummary(){
- document.getElementById("summaryModal").style.display="none";
 }
 </script>
 
