@@ -5,13 +5,8 @@
 <title>AR Menu</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- A-Frame -->
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-<!-- AR.js -->
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
-
-<!-- Animation Mixer -->
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -28,12 +23,11 @@ body{
 #loader{
  position:fixed;
  inset:0;
- background:rgba(10,10,10,.92);
+ background:rgba(0,0,0,.85);
  display:none;
  align-items:center;
  justify-content:center;
- color:#fff;
- letter-spacing:.3px;
+ color:white;
  z-index:30;
 }
 
@@ -41,7 +35,7 @@ body{
 #menuOverlay{
  position:fixed;
  inset:0;
- background:rgba(0,0,0,.55);
+ background:rgba(0,0,0,.6);
  backdrop-filter:blur(22px);
  display:flex;
  align-items:center;
@@ -50,114 +44,98 @@ body{
 }
 
 .menuBox{
- width:min(92%,420px);
- background:rgba(25,25,25,.85);
+ width:min(90%,420px);
+ background:rgba(22,22,22,.88);
  padding:34px;
- border-radius:22px;
- box-shadow:0 25px 80px rgba(0,0,0,.7);
+ border-radius:26px;
 }
 
 .menuTitle{
- color:#fff;
  text-align:center;
+ color:white;
  font-size:22px;
- font-weight:500;
  margin-bottom:28px;
 }
 
 .menuCard{
  padding:18px;
- border-radius:16px;
- background:rgba(255,255,255,.05);
- border:1px solid rgba(255,255,255,.08);
+ border-radius:18px;
+ background:rgba(255,255,255,.06);
  margin-bottom:16px;
  cursor:pointer;
- transition:.25s;
 }
 
 .menuCard:hover{
- background:rgba(255,255,255,.09);
+ background:rgba(255,255,255,.1);
 }
 
-.dishName{
- color:#fff;
- font-size:17px;
-}
+.dishName{color:white;font-size:17px}
+.dishDesc{color:#cfcfcf;font-size:13px}
+.price{color:#e6c46f;margin-top:6px}
 
-.dishDesc{
- color:#cfcfcf;
- font-size:13px;
- margin-top:6px;
-}
-
-.price{
- color:#e7c873;
- font-size:14px;
- margin-top:8px;
-}
-
-/* BOTTOM BAR */
+/* BOTTOM NAV */
 #bottomBar{
  position:fixed;
  bottom:22px;
  left:50%;
  transform:translateX(-50%);
- background:rgba(15,15,15,.7);
- backdrop-filter:blur(14px);
- padding:14px 22px;
- border-radius:20px;
+ background:rgba(18,18,18,.7);
+ backdrop-filter:blur(16px);
+ padding:14px 26px;
+ border-radius:30px;
  display:none;
- align-items:center;
- gap:18px;
- color:#fff;
+ gap:28px;
+ color:white;
  z-index:10;
 }
 
-.controlBtn{
- padding:6px 14px;
- background:rgba(255,255,255,.08);
- border-radius:10px;
+.navBtn{
+ font-size:20px;
  cursor:pointer;
- transition:.2s;
 }
 
-.controlBtn:hover{
- background:rgba(255,255,255,.14);
-}
-
-#dishLabel{
- min-width:140px;
+/* INFO CARD */
+#infoCard{
+ position:fixed;
+ top:28px;
+ left:50%;
+ transform:translateX(-50%);
+ background:rgba(20,20,20,.72);
+ backdrop-filter:blur(18px);
+ padding:18px 26px;
+ border-radius:22px;
  text-align:center;
+ color:white;
+ z-index:10;
+ display:none;
+}
+
+#infoTitle{
+ font-size:18px;
  font-weight:500;
 }
 
-/* AR SHADOW */
-.shadow{
- width:2.6;
- height:2.6;
- background:radial-gradient(circle, rgba(0,0,0,.45), rgba(0,0,0,0));
+#infoDesc{
+ font-size:13px;
+ color:#cfcfcf;
+ margin-top:6px;
 }
 
-/* FADE */
-.fadeIn{
- animation:fade .4s ease forwards;
-}
-
-@keyframes fade{
- from{opacity:0;}
- to{opacity:1;}
+#infoPrice{
+ margin-top:8px;
+ font-size:15px;
+ color:#e6c46f;
 }
 </style>
 </head>
 
 <body>
 
-<div id="loader">Loading model…</div>
+<div id="loader">Loading model...</div>
 
 <!-- MENU -->
 <div id="menuOverlay">
- <div class="menuBox fadeIn">
-
+ <div class="menuBox">
   <div class="menuTitle">Menu</div>
 
   <div class="menuCard" onclick="selectDish(0)">
@@ -171,15 +149,20 @@ body{
    <div class="dishDesc">Lemon butter garlic sauce</div>
    <div class="price">₹399</div>
   </div>
-
  </div>
 </div>
 
-<!-- CONTROLS -->
+<!-- INFO CARD -->
+<div id="infoCard">
+ <div id="infoTitle"></div>
+ <div id="infoDesc"></div>
+ <div id="infoPrice"></div>
+</div>
+
+<!-- NAV -->
 <div id="bottomBar">
- <div class="controlBtn" onclick="prevDish()">‹</div>
- <div id="dishLabel"></div>
- <div class="controlBtn" onclick="nextDish()">›</div>
+ <div class="navBtn" onclick="prevDish()">‹</div>
+ <div class="navBtn" onclick="nextDish()">›</div>
 </div>
 
 <!-- AR -->
@@ -193,51 +176,35 @@ body{
   src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
-<!-- LIGHTING -->
-<a-entity light="type:ambient;intensity:0.7"></a-entity>
+<!-- LIGHT -->
+<a-entity light="type:ambient;intensity:0.75"></a-entity>
 <a-entity light="type:directional;intensity:1.2" position="0 3 2"></a-entity>
 
 <a-marker preset="hiro">
 
- <!-- SOFT SHADOW -->
- <a-plane rotation="-90 0 0"
-  width="2.6" height="2.6"
-  material="shader:flat; transparent:true; opacity:0.45;
-  src:data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'>
-  <defs>
-   <radialGradient id='g'>
-    <stop offset='0%' stop-color='black'/>
-    <stop offset='70%' stop-color='black'/>
-    <stop offset='100%' stop-color='transparent'/>
-   </radialGradient>
-  </defs>
-  <rect width='256' height='256' fill='url(#g)'/>
-  </svg>">
- </a-plane>
+<!-- SHADOW -->
+<a-plane rotation="-90 0 0" width="2.6" height="2.6"
+ material="color:#000;opacity:0.35"></a-plane>
 
- <!-- PASTA -->
- <a-entity id="pastaHolder"
-  position="0 0.6 0"
-  animation="property:rotation;to:0 360 0;loop:true;dur:16000">
+<!-- PASTA -->
+<a-entity id="pastaHolder"
+ position="0 0.6 0"
+ animation="property:rotation;to:0 360 0;loop:true;dur:16000">
 
-  <a-entity id="pasta"
-   gltf-model="#pastaModel"
-   scale="8 8 8"
-   visible="false"></a-entity>
+ <a-entity id="pasta"
+  gltf-model="#pastaModel"
+  scale="8 8 8"
+  visible="false"></a-entity>
+</a-entity>
 
- </a-entity>
-
- <!-- CAPY -->
- <a-entity id="capyHolder" position="0 0.6 0">
-
-  <a-entity id="capy"
-   gltf-model="#capyModel"
-   animation-mixer="clip:*;loop:repeat"
-   scale="5 5 5"
-   visible="false"></a-entity>
-
- </a-entity>
+<!-- CAPY -->
+<a-entity id="capyHolder" position="0 0.6 0">
+ <a-entity id="capy"
+  gltf-model="#capyModel"
+  animation-mixer="clip:*;loop:repeat"
+  scale="5 5 5"
+  visible="false"></a-entity>
+</a-entity>
 
 </a-marker>
 
@@ -246,8 +213,8 @@ body{
 
 <script>
 const dishes=[
- {name:"Pomodoro Pasta", id:"pasta"},
- {name:"Capybara Piccata", id:"capy"}
+ {name:"Pomodoro Pasta",desc:"Slow tomato sauce, basil",price:"₹299",id:"pasta"},
+ {name:"Capybara Piccata",desc:"Lemon butter garlic sauce",price:"₹399",id:"capy"}
 ];
 
 let currentIndex=0;
@@ -255,11 +222,20 @@ let currentIndex=0;
 const overlay=document.getElementById("menuOverlay");
 const loader=document.getElementById("loader");
 const bottomBar=document.getElementById("bottomBar");
-const dishLabel=document.getElementById("dishLabel");
+const infoCard=document.getElementById("infoCard");
+const infoTitle=document.getElementById("infoTitle");
+const infoDesc=document.getElementById("infoDesc");
+const infoPrice=document.getElementById("infoPrice");
 
 function hideAll(){
  document.getElementById("pasta").setAttribute("visible","false");
  document.getElementById("capy").setAttribute("visible","false");
+}
+
+function updateInfo(i){
+ infoTitle.textContent=dishes[i].name;
+ infoDesc.textContent=dishes[i].desc;
+ infoPrice.textContent=dishes[i].price;
 }
 
 function showDish(i){
@@ -272,12 +248,13 @@ function showDish(i){
  model.addEventListener("model-loaded",()=>{
    loader.style.display="none";
    if(model.hasAttribute("animation-mixer")){
-     model.components["animation-mixer"].play();
+    model.components["animation-mixer"].play();
    }
  },{once:true});
 
  model.setAttribute("visible","true");
- dishLabel.textContent=dishes[i].name;
+ updateInfo(i);
+ infoCard.style.display="block";
 }
 
 function selectDish(i){
