@@ -5,114 +5,126 @@
 <title>AR Dining Experience</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- A-Frame -->
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-<!-- AR.js -->
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
-
-<!-- Animation Mixer -->
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 body{
-  margin:0;
-  font-family:Inter,sans-serif;
-  background:#0f0f0f;
-  overflow:hidden;
+margin:0;
+font-family:Inter,sans-serif;
+background:#0f0f0f;
+overflow:hidden;
+color:white;
 }
 
-/* ---------- Layout ---------- */
+/* ---------- UI ---------- */
 
 #ui{
-  position:fixed;
-  inset:0;
-  display:flex;
-  z-index:5;
-  background:rgba(0,0,0,0.45);
-  backdrop-filter:blur(18px);
+position:fixed;
+inset:0;
+display:flex;
+background:rgba(0,0,0,.55);
+backdrop-filter:blur(18px);
+z-index:5;
 }
 
-/* Left Preview */
+/* Preview */
 
-#previewPane{
-  width:50%;
-  position:relative;
-}
-
+#previewPane{width:50%;position:relative;}
 #previewInfo{
-  position:absolute;
-  bottom:40px;
-  left:40px;
-  background:rgba(0,0,0,0.55);
-  backdrop-filter:blur(12px);
-  padding:22px;
-  border-radius:18px;
-  color:white;
-  max-width:320px;
+position:absolute;
+bottom:40px;left:40px;
+background:rgba(0,0,0,.6);
+padding:24px;border-radius:18px;
+max-width:340px;
 }
+#previewInfo h2{margin:0;font-size:26px;}
+#previewInfo p{margin:6px 0;color:#ddd}
 
-/* Right Menu */
+/* Menu */
 
 #menuPane{
-  width:50%;
-  padding:60px 40px;
-  overflow-y:auto;
+width:50%;
+padding:60px 40px;
+overflow-y:auto;
 }
 
 .menuItem{
-  padding:22px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,0.08);
-  margin-bottom:20px;
-  cursor:pointer;
-  transition:.3s;
+padding:22px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,.15);
+margin-bottom:22px;
+cursor:pointer;
+font-size:18px;
+font-weight:500;
+transition:.3s;
 }
-
 .menuItem:hover{
-  background:rgba(255,255,255,0.06);
+background:rgba(255,255,255,.08);
 }
 
 /* Buttons */
 
 button{
-  padding:12px 22px;
-  border-radius:18px;
-  background:rgba(0,0,0,0.6);
-  border:1px solid rgba(255,255,255,0.15);
-  color:white;
-  margin-top:16px;
+padding:14px 26px;
+border-radius:20px;
+background:rgba(0,0,0,.7);
+border:1px solid rgba(255,255,255,.25);
+color:white;
+font-size:15px;
 }
 
 #viewAR{
-  position:absolute;
-  bottom:40px;
-  right:40px;
-  z-index:10;
+position:absolute;
+bottom:40px;right:40px;
 }
 
 /* Order Panel */
 
 #orderPanel{
-  position:fixed;
-  bottom:90px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,.6);
-  padding:14px 20px;
-  border-radius:18px;
-  display:none;
-  gap:12px;
-  color:white;
-  z-index:10;
+position:fixed;
+bottom:110px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(0,0,0,.7);
+padding:16px 24px;
+border-radius:18px;
+display:none;
+gap:14px;
+z-index:10;
 }
 .qtyBtn{
-  padding:4px 10px;
-  background:#222;
-  border-radius:6px;
-  cursor:pointer;
+background:#222;
+padding:6px 12px;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* AR Nav */
+
+#arNav{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+display:none;
+gap:30px;
+z-index:10;
+}
+
+.arrowBtn{
+width:50px;height:50px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:rgba(0,0,0,.6);
+border:1px solid rgba(255,255,255,.3);
+font-size:22px;
+cursor:pointer;
 }
 </style>
 </head>
@@ -122,82 +134,78 @@ button{
 <!-- UI -->
 <div id="ui">
 
-<!-- LEFT PREVIEW -->
 <div id="previewPane">
-  <a-scene embedded renderer="colorManagement:true">
-    <a-assets>
-      <a-asset-item id="pastaModel" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
-      <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
-    </a-assets>
+<a-scene embedded renderer="colorManagement:true">
+<a-assets>
+<a-asset-item id="pastaModel" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
+<a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
+</a-assets>
 
-    <a-entity light="type:ambient;intensity:0.7"></a-entity>
-    <a-entity light="type:directional;intensity:0.8" position="1 2 1"></a-entity>
+<a-entity light="type:ambient;intensity:.7"></a-entity>
+<a-entity light="type:directional;intensity:.8" position="1 2 1"></a-entity>
 
-    <a-entity id="previewModel" gltf-model="#pastaModel"
-      rotation="0 0 0"
-      animation="property: rotation; to: 0 360 0; loop:true; dur:15000"
-      scale="5 5 5">
-    </a-entity>
+<a-entity id="previewModel"
+gltf-model="#pastaModel"
+animation="property:rotation;to:0 360 0;loop:true;dur:15000"
+scale="5 5 5"></a-entity>
 
-    <a-entity camera position="0 0 5"></a-entity>
-  </a-scene>
+<a-entity camera position="0 0 5"></a-entity>
+</a-scene>
 
-  <div id="previewInfo">
-    <h2 id="previewName">Pomodoro Pasta</h2>
-    <p id="previewDesc">Slow tomato sauce, basil</p>
-    <p id="previewPrice">₹299</p>
-  </div>
+<div id="previewInfo">
+<h2 id="previewName">Pomodoro Pasta</h2>
+<p id="previewDesc">Slow tomato sauce, basil</p>
+<p id="previewPrice">₹299</p>
+</div>
 </div>
 
-<!-- RIGHT MENU -->
 <div id="menuPane">
-
-  <div class="menuItem" onclick="selectDish('pasta')">
-    Pomodoro Pasta — ₹299
-  </div>
-
-  <div class="menuItem" onclick="selectDish('capy')">
-    Capybara Piccata — ₹399
-  </div>
-
+<div class="menuItem" onclick="selectDish('pasta')">Pomodoro Pasta — ₹299</div>
+<div class="menuItem" onclick="selectDish('capy')">Capybara Piccata — ₹399</div>
 </div>
 
 <button id="viewAR" onclick="openAR()">View in AR</button>
-
 </div>
 
-<!-- ORDER PANEL -->
+<!-- Order Panel -->
 <div id="orderPanel">
-  <span id="dishLabel"></span>
-  <div class="qtyBtn" onclick="changeQty(-1)">-</div>
-  <span id="qty">1</span>
-  <div class="qtyBtn" onclick="changeQty(1)">+</div>
-  <div class="qtyBtn" onclick="confirmOrder()">Order</div>
+<span id="dishLabel"></span>
+<div class="qtyBtn" onclick="changeQty(-1)">-</div>
+<span id="qty">1</span>
+<div class="qtyBtn" onclick="changeQty(1)">+</div>
+<div class="qtyBtn" onclick="confirmOrder()">Order</div>
 </div>
 
-<!-- AR SCENE -->
+<!-- AR Nav -->
+<div id="arNav">
+<div class="arrowBtn" onclick="prevDish()">‹</div>
+<div class="arrowBtn" onclick="nextDish()">›</div>
+</div>
+
+<!-- AR Scene -->
 <a-scene id="arScene" style="display:none"
- embedded
- arjs="sourceType:webcam;debugUIEnabled:false">
+embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
-  <a-asset-item id="pastaAR" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
-  <a-asset-item id="capyAR" src="assets/jb.glb"></a-asset-item>
+<a-asset-item id="pastaAR" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
+<a-asset-item id="capyAR" src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
 <a-entity light="type:ambient;intensity:.4"></a-entity>
 <a-entity light="type:directional;intensity:.6" position="1 2 1"></a-entity>
 
 <a-marker preset="hiro">
-  <a-entity id="pastaARModel" gltf-model="#pastaAR" scale="8 8 8" visible="false"></a-entity>
-  <a-entity id="capyARModel" gltf-model="#capyAR" animation-mixer scale="5 5 5" visible="false"></a-entity>
+<a-entity id="pastaARModel" gltf-model="#pastaAR" scale="8 8 8" visible="false"></a-entity>
+<a-entity id="capyARModel" gltf-model="#capyAR" animation-mixer scale="5 5 5" visible="false"></a-entity>
 </a-marker>
 
 <a-entity camera></a-entity>
 </a-scene>
 
 <script>
-let current="pasta", qty=1;
+let dishes=["pasta","capy"];
+let index=0;
+let qty=1;
 
 const preview=document.getElementById("previewModel");
 const nameEl=document.getElementById("previewName");
@@ -208,16 +216,18 @@ const pastaAR=document.getElementById("pastaARModel");
 const capyAR=document.getElementById("capyARModel");
 
 function selectDish(type){
-current=type;
+index=dishes.indexOf(type);
+updatePreview();
+}
 
-if(type==="pasta"){
+function updatePreview(){
+if(dishes[index]==="pasta"){
 preview.setAttribute("gltf-model","#pastaModel");
 nameEl.textContent="Pomodoro Pasta";
 descEl.textContent="Slow tomato sauce, basil";
 priceEl.textContent="₹299";
 }
-
-if(type==="capy"){
+if(dishes[index]==="capy"){
 preview.setAttribute("gltf-model","#capyModel");
 nameEl.textContent="Capybara Piccata";
 descEl.textContent="Lemon butter garlic sauce";
@@ -228,15 +238,30 @@ priceEl.textContent="₹399";
 function openAR(){
 document.getElementById("ui").style.display="none";
 document.getElementById("arScene").style.display="block";
+document.getElementById("orderPanel").style.display="flex";
+document.getElementById("arNav").style.display="flex";
+showARDish();
+}
 
+function showARDish(){
 pastaAR.setAttribute("visible","false");
 capyAR.setAttribute("visible","false");
 
-if(current==="pasta") pastaAR.setAttribute("visible","true");
-if(current==="capy") capyAR.setAttribute("visible","true");
+if(dishes[index]==="pasta") pastaAR.setAttribute("visible","true");
+if(dishes[index]==="capy") capyAR.setAttribute("visible","true");
 
-document.getElementById("orderPanel").style.display="flex";
-document.getElementById("dishLabel").textContent=(current==="pasta"?"Pomodoro Pasta":"Capybara Piccata")+" | Table 4";
+document.getElementById("dishLabel").textContent=
+(dishes[index]==="pasta"?"Pomodoro Pasta":"Capybara Piccata")+" | Table 4";
+}
+
+function nextDish(){
+index=(index+1)%dishes.length;
+showARDish();
+}
+
+function prevDish(){
+index=(index-1+dishes.length)%dishes.length;
+showARDish();
 }
 
 function changeQty(v){
@@ -245,7 +270,7 @@ document.getElementById("qty").textContent=qty;
 }
 
 function confirmOrder(){
-alert("Order Sent (Demo)\n"+current+"\nQty:"+qty+"\nTable:4");
+alert("Order Sent (Demo)\n"+dishes[index]+"\nQty:"+qty+"\nTable:4");
 }
 </script>
 
