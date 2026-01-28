@@ -5,18 +5,24 @@
 <title>AR Menu</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- A-Frame -->
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+<!-- AR.js -->
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+
+<!-- Animation mixer -->
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- 3D Text Geometry -->
+<script src="https://cdn.jsdelivr.net/npm/aframe-text-geometry-component@0.5.1/dist/aframe-text-geometry-component.min.js"></script>
 
 <style>
 body{
  margin:0;
  background:black;
- font-family:Inter,sans-serif;
  overflow:hidden;
+ font-family:sans-serif;
 }
 
 /* LOADER */
@@ -36,7 +42,7 @@ body{
  position:fixed;
  inset:0;
  background:rgba(0,0,0,.6);
- backdrop-filter:blur(20px);
+ backdrop-filter:blur(18px);
  display:flex;
  align-items:center;
  justify-content:center;
@@ -79,8 +85,8 @@ body{
 }
 
 .navBtn{
- cursor:pointer;
  font-size:22px;
+ cursor:pointer;
 }
 </style>
 </head>
@@ -114,7 +120,7 @@ body{
  <div class="navBtn" onclick="nextDish()">›</div>
 </div>
 
-<!-- AR -->
+<!-- AR SCENE -->
 <a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
@@ -125,34 +131,45 @@ body{
   src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
-<!-- LIGHT -->
+<!-- LIGHTING -->
 <a-entity light="type:ambient;intensity:0.7"></a-entity>
 <a-entity light="type:directional;intensity:1.2" position="0 3 2"></a-entity>
 
 <a-marker preset="hiro">
 
-<!-- SHADOW -->
-<a-plane rotation="-90 0 0" width="2.5" height="2.5"
+<!-- SOFT SHADOW -->
+<a-plane rotation="-90 0 0" width="2.6" height="2.6"
  material="color:#000;opacity:0.35"></a-plane>
 
-<!-- 3D TEXT GROUP -->
-<a-entity id="textGroup" position="0 1.4 0">
+<!-- TEXT + GLASS PANEL -->
+<a-entity id="textGroup" position="0 2.1 0" look-at="[camera]">
 
+ <!-- GLASS BACK -->
+ <a-plane width="2.6" height="1.1"
+  material="color:#111;opacity:0.55;transparent:true"
+  position="0 0 0"></a-plane>
+
+ <!-- TITLE -->
  <a-entity id="titleText"
-  text="value: ; align:center; color:#ffffff; width:3;"
-  position="0 0.25 0"></a-entity>
+  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.22; height:0.04"
+  material="color:#ffffff"
+  position="-1.2 0.25 0.02"></a-entity>
 
+ <!-- DESC -->
  <a-entity id="descText"
-  text="value: ; align:center; color:#cccccc; width:3;"
-  position="0 0 0"></a-entity>
+  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_regular.typeface.json; size:0.12; height:0.03"
+  material="color:#cccccc"
+  position="-1.2 -0.05 0.02"></a-entity>
 
+ <!-- PRICE -->
  <a-entity id="priceText"
-  text="value: ; align:center; color:#e6c46f; width:3;"
-  position="0 -0.25 0"></a-entity>
+  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.14; height:0.04"
+  material="color:#e6c46f"
+  position="-1.2 -0.35 0.02"></a-entity>
 
 </a-entity>
 
-<!-- PASTA -->
+<!-- PASTA (ROTATES) -->
 <a-entity id="pastaHolder"
  position="0 0.6 0"
  animation="property:rotation;to:0 360 0;loop:true;dur:16000">
@@ -164,7 +181,7 @@ body{
 
 </a-entity>
 
-<!-- CAPY -->
+<!-- CAPY (ANIMATES) -->
 <a-entity id="capyHolder" position="0 0.6 0">
 
  <a-entity id="capy"
@@ -202,9 +219,9 @@ function hideAll(){
 }
 
 function update3DText(i){
- titleText.setAttribute("text","value: "+dishes[i].name);
- descText.setAttribute("text","value: "+dishes[i].desc);
- priceText.setAttribute("text","value: "+dishes[i].price);
+ titleText.setAttribute("text-geometry","value:"+dishes[i].name);
+ descText.setAttribute("text-geometry","value:"+dishes[i].desc);
+ priceText.setAttribute("text-geometry","value:"+dishes[i].price);
 }
 
 function showDish(i){
@@ -217,7 +234,7 @@ function showDish(i){
  model.addEventListener("model-loaded",()=>{
    loader.style.display="none";
    if(model.hasAttribute("animation-mixer")){
-    model.components["animation-mixer"].play();
+     model.components["animation-mixer"].play();
    }
  },{once:true});
 
