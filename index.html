@@ -9,12 +9,12 @@
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 body{
  margin:0;
- background:#0b0b0b;
+ background:black;
  font-family:Inter,sans-serif;
  overflow:hidden;
 }
@@ -28,7 +28,7 @@ body{
  align-items:center;
  justify-content:center;
  color:white;
- z-index:30;
+ z-index:20;
 }
 
 /* MENU */
@@ -36,95 +36,51 @@ body{
  position:fixed;
  inset:0;
  background:rgba(0,0,0,.6);
- backdrop-filter:blur(22px);
+ backdrop-filter:blur(20px);
  display:flex;
  align-items:center;
  justify-content:center;
- z-index:20;
+ z-index:10;
 }
 
 .menuBox{
- width:min(90%,420px);
- background:rgba(22,22,22,.88);
- padding:34px;
- border-radius:26px;
-}
-
-.menuTitle{
- text-align:center;
- color:white;
- font-size:22px;
- margin-bottom:28px;
+ width:90%;
+ max-width:420px;
+ background:#1a1a1a;
+ padding:30px;
+ border-radius:22px;
 }
 
 .menuCard{
  padding:18px;
- border-radius:18px;
- background:rgba(255,255,255,.06);
- margin-bottom:16px;
+ background:#2a2a2a;
+ border-radius:14px;
+ margin-bottom:14px;
  cursor:pointer;
-}
-
-.menuCard:hover{
- background:rgba(255,255,255,.1);
 }
 
 .dishName{color:white;font-size:17px}
-.dishDesc{color:#cfcfcf;font-size:13px}
-.price{color:#e6c46f;margin-top:6px}
+.dishDesc{color:#ccc;font-size:13px}
+.price{color:#e6c46f}
 
-/* BOTTOM NAV */
+/* NAV */
 #bottomBar{
  position:fixed;
- bottom:22px;
+ bottom:20px;
  left:50%;
  transform:translateX(-50%);
- background:rgba(18,18,18,.7);
- backdrop-filter:blur(16px);
- padding:14px 26px;
- border-radius:30px;
+ background:#000000aa;
+ padding:14px 24px;
+ border-radius:20px;
  display:none;
- gap:28px;
+ gap:22px;
  color:white;
- z-index:10;
+ z-index:5;
 }
 
 .navBtn{
- font-size:20px;
  cursor:pointer;
-}
-
-/* INFO CARD */
-#infoCard{
- position:fixed;
- top:28px;
- left:50%;
- transform:translateX(-50%);
- background:rgba(20,20,20,.72);
- backdrop-filter:blur(18px);
- padding:18px 26px;
- border-radius:22px;
- text-align:center;
- color:white;
- z-index:10;
- display:none;
-}
-
-#infoTitle{
- font-size:18px;
- font-weight:500;
-}
-
-#infoDesc{
- font-size:13px;
- color:#cfcfcf;
- margin-top:6px;
-}
-
-#infoPrice{
- margin-top:8px;
- font-size:15px;
- color:#e6c46f;
+ font-size:22px;
 }
 </style>
 </head>
@@ -136,7 +92,6 @@ body{
 <!-- MENU -->
 <div id="menuOverlay">
  <div class="menuBox">
-  <div class="menuTitle">Menu</div>
 
   <div class="menuCard" onclick="selectDish(0)">
    <div class="dishName">Pomodoro Pasta</div>
@@ -149,14 +104,8 @@ body{
    <div class="dishDesc">Lemon butter garlic sauce</div>
    <div class="price">₹399</div>
   </div>
- </div>
-</div>
 
-<!-- INFO CARD -->
-<div id="infoCard">
- <div id="infoTitle"></div>
- <div id="infoDesc"></div>
- <div id="infoPrice"></div>
+ </div>
 </div>
 
 <!-- NAV -->
@@ -177,14 +126,31 @@ body{
 </a-assets>
 
 <!-- LIGHT -->
-<a-entity light="type:ambient;intensity:0.75"></a-entity>
+<a-entity light="type:ambient;intensity:0.7"></a-entity>
 <a-entity light="type:directional;intensity:1.2" position="0 3 2"></a-entity>
 
 <a-marker preset="hiro">
 
 <!-- SHADOW -->
-<a-plane rotation="-90 0 0" width="2.6" height="2.6"
+<a-plane rotation="-90 0 0" width="2.5" height="2.5"
  material="color:#000;opacity:0.35"></a-plane>
+
+<!-- 3D TEXT GROUP -->
+<a-entity id="textGroup" position="0 1.4 0">
+
+ <a-entity id="titleText"
+  text="value: ; align:center; color:#ffffff; width:3;"
+  position="0 0.25 0"></a-entity>
+
+ <a-entity id="descText"
+  text="value: ; align:center; color:#cccccc; width:3;"
+  position="0 0 0"></a-entity>
+
+ <a-entity id="priceText"
+  text="value: ; align:center; color:#e6c46f; width:3;"
+  position="0 -0.25 0"></a-entity>
+
+</a-entity>
 
 <!-- PASTA -->
 <a-entity id="pastaHolder"
@@ -195,15 +161,18 @@ body{
   gltf-model="#pastaModel"
   scale="8 8 8"
   visible="false"></a-entity>
+
 </a-entity>
 
 <!-- CAPY -->
 <a-entity id="capyHolder" position="0 0.6 0">
+
  <a-entity id="capy"
   gltf-model="#capyModel"
   animation-mixer="clip:*;loop:repeat"
   scale="5 5 5"
   visible="false"></a-entity>
+
 </a-entity>
 
 </a-marker>
@@ -222,20 +191,20 @@ let currentIndex=0;
 const overlay=document.getElementById("menuOverlay");
 const loader=document.getElementById("loader");
 const bottomBar=document.getElementById("bottomBar");
-const infoCard=document.getElementById("infoCard");
-const infoTitle=document.getElementById("infoTitle");
-const infoDesc=document.getElementById("infoDesc");
-const infoPrice=document.getElementById("infoPrice");
+
+const titleText=document.getElementById("titleText");
+const descText=document.getElementById("descText");
+const priceText=document.getElementById("priceText");
 
 function hideAll(){
  document.getElementById("pasta").setAttribute("visible","false");
  document.getElementById("capy").setAttribute("visible","false");
 }
 
-function updateInfo(i){
- infoTitle.textContent=dishes[i].name;
- infoDesc.textContent=dishes[i].desc;
- infoPrice.textContent=dishes[i].price;
+function update3DText(i){
+ titleText.setAttribute("text","value: "+dishes[i].name);
+ descText.setAttribute("text","value: "+dishes[i].desc);
+ priceText.setAttribute("text","value: "+dishes[i].price);
 }
 
 function showDish(i){
@@ -253,8 +222,7 @@ function showDish(i){
  },{once:true});
 
  model.setAttribute("visible","true");
- updateInfo(i);
- infoCard.style.display="block";
+ update3DText(i);
 }
 
 function selectDish(i){
