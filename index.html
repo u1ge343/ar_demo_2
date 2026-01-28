@@ -127,7 +127,6 @@ body{
  margin:10px 0;
 }
 
-/* CLOSE BTN */
 .closeBtn{
  text-align:center;
  margin-top:16px;
@@ -183,8 +182,11 @@ body{
 <a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
- <a-asset-item id="pastaModel" src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
- <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
+ <a-asset-item id="pastaModel"
+  src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
+
+ <a-asset-item id="capyModel"
+  src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
 <a-entity light="type:ambient;intensity:.5"></a-entity>
@@ -193,7 +195,8 @@ body{
 <a-marker preset="hiro">
 
  <!-- SHADOW -->
- <a-plane rotation="-90 0 0" width="3" height="3"
+ <a-plane rotation="-90 0 0"
+  width="3" height="3"
   material="color:#000;opacity:0.35"></a-plane>
 
  <!-- ROTATING HOLDER -->
@@ -201,8 +204,18 @@ body{
   position="0 0.6 0"
   animation="property:rotation;to:0 360 0;loop:true;dur:15000">
 
-  <a-entity id="pasta" gltf-model="#pastaModel" scale="8 8 8" visible="false"></a-entity>
-  <a-entity id="capy" gltf-model="#capyModel" scale="5 5 5" visible="false"></a-entity>
+  <!-- PASTA -->
+  <a-entity id="pasta"
+   gltf-model="#pastaModel"
+   scale="8 8 8"
+   visible="false"></a-entity>
+
+  <!-- CAPY WITH ANIMATION -->
+  <a-entity id="capy"
+   gltf-model="#capyModel"
+   animation-mixer="loop: repeat"
+   scale="5 5 5"
+   visible="false"></a-entity>
 
  </a-entity>
 
@@ -237,8 +250,15 @@ function showDish(i){
  loader.style.display="flex";
  hideAll();
  currentIndex=i;
+
  setTimeout(()=>{
-  document.getElementById(dishes[i].id).setAttribute("visible","true");
+  const model=document.getElementById(dishes[i].id);
+  model.setAttribute("visible","true");
+
+  if(model.hasAttribute("animation-mixer")){
+   model.components["animation-mixer"].play();
+  }
+
   dishLabel.textContent=dishes[i].name;
   loader.style.display="none";
  },600);
