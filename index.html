@@ -18,7 +18,6 @@ body{
  overflow:hidden;
 }
 
-/* LOADER */
 #loader{
  position:fixed;
  inset:0;
@@ -32,7 +31,6 @@ body{
  display:none;
 }
 
-/* CART BADGE */
 #cartBadge{
  position:fixed;
  top:20px;
@@ -46,7 +44,6 @@ body{
  cursor:pointer;
 }
 
-/* MENU OVERLAY */
 #menuOverlay{
  position:fixed;
  inset:0;
@@ -65,7 +62,6 @@ body{
  border-radius:22px;
 }
 
-/* CARDS */
 .menuCard{
  padding:18px;
  border-radius:14px;
@@ -79,7 +75,6 @@ body{
 .dishDesc{color:#e0e0e0;font-size:13px}
 .price{color:#ffd36b}
 
-/* BOTTOM BAR */
 #bottomBar{
  position:fixed;
  bottom:20px;
@@ -102,7 +97,6 @@ body{
  cursor:pointer;
 }
 
-/* ORDER SUMMARY */
 #summaryModal{
  position:fixed;
  inset:0;
@@ -178,7 +172,7 @@ body{
  </div>
 </div>
 
-<!-- AR -->
+<!-- AR SCENE -->
 <a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
@@ -195,22 +189,24 @@ body{
 <a-marker preset="hiro">
 
  <!-- SHADOW -->
- <a-plane rotation="-90 0 0"
-  width="3" height="3"
-  material="color:#000;opacity:0.35"></a-plane>
+ <a-plane rotation="-90 0 0" width="3" height="3"
+ material="color:#000;opacity:0.35"></a-plane>
 
- <!-- ROTATING HOLDER -->
- <a-entity id="holder"
+ <!-- PASTA ROTATOR -->
+ <a-entity id="pastaHolder"
   position="0 0.6 0"
   animation="property:rotation;to:0 360 0;loop:true;dur:15000">
 
-  <!-- PASTA -->
   <a-entity id="pasta"
    gltf-model="#pastaModel"
    scale="8 8 8"
    visible="false"></a-entity>
 
-  <!-- CAPY WITH ANIMATION -->
+ </a-entity>
+
+ <!-- CAPY (NO ROTATION) -->
+ <a-entity id="capyHolder" position="0 0.6 0">
+
   <a-entity id="capy"
    gltf-model="#capyModel"
    animation-mixer="loop: repeat"
@@ -241,9 +237,8 @@ const cartCount=document.getElementById("cartCount");
 const summaryList=document.getElementById("summaryList");
 
 function hideAll(){
- dishes.forEach(d=>{
-  document.getElementById(d.id).setAttribute("visible","false");
- });
+ document.getElementById("pasta").setAttribute("visible","false");
+ document.getElementById("capy").setAttribute("visible","false");
 }
 
 function showDish(i){
@@ -251,17 +246,18 @@ function showDish(i){
  hideAll();
  currentIndex=i;
 
- setTimeout(()=>{
-  const model=document.getElementById(dishes[i].id);
-  model.setAttribute("visible","true");
+ const model=document.getElementById(dishes[i].id);
 
-  if(model.hasAttribute("animation-mixer")){
-   model.components["animation-mixer"].play();
-  }
+ model.addEventListener("model-loaded", ()=>{
+   loader.style.display="none";
 
-  dishLabel.textContent=dishes[i].name;
-  loader.style.display="none";
- },600);
+   if(model.hasAttribute("animation-mixer")){
+    model.components["animation-mixer"].play();
+   }
+ },{once:true});
+
+ model.setAttribute("visible","true");
+ dishLabel.textContent=dishes[i].name;
 }
 
 function selectDish(i){
