@@ -125,7 +125,7 @@ body{
 <a-assets>
  <!-- PASTA -->
  <a-asset-item id="pastaModel"
- src="assets/a.glb"></a-asset-item>
+ src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
 
  <!-- CAPYBARA -->
  <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
@@ -141,11 +141,8 @@ body{
 <a-plane rotation="-90 0 0" width="2.6" height="2.6"
  material="color:#000;opacity:0.35"></a-plane>
 
-<!-- TEXT + GLASS PANEL -->
+<!-- 3D TEXT -->
 <a-entity id="textGroup" position="0 2.1 0" look-at="[camera]">
-
- <a-plane width="2.6" height="1.1"
-  material="color:#111;opacity:0.55;transparent:true"></a-plane>
 
  <a-entity id="titleText"
   text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.22; height:0.04"
@@ -164,26 +161,22 @@ body{
 
 </a-entity>
 
-<!-- PASTA ROTATES -->
-<a-entity position="0 0.6 0"
- animation="property:rotation;to:0 360 0;loop:true;dur:16000">
-
+<!-- PASTA (NO ROTATION) -->
+<a-entity position="0 0.6 0">
  <a-entity id="pasta"
   gltf-model="#pastaModel"
+  animation-mixer="clip:*;loop:repeat"
   scale="8 8 8"
   visible="false"></a-entity>
-
 </a-entity>
 
-<!-- CAPYBARA ANIMATES -->
+<!-- CAPYBARA (ANIMATES) -->
 <a-entity position="0 0.6 0">
-
  <a-entity id="capy"
   gltf-model="#capyModel"
   animation-mixer="clip:*;loop:repeat"
   scale="5 5 5"
   visible="false"></a-entity>
-
 </a-entity>
 
 </a-marker>
