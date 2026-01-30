@@ -25,7 +25,6 @@ body{
  font-family:sans-serif;
 }
 
-/* LOADER */
 #loader{
  position:fixed;
  inset:0;
@@ -124,44 +123,40 @@ body{
 <a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
+ <!-- PASTA -->
  <a-asset-item id="pastaModel"
-  src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
+ src="https://raw.githubusercontent.com/u1ge343/RES_AR/refs/heads/main/assets/a.glb"></a-asset-item>
 
- <a-asset-item id="capyModel"
-  src="assets/jb.glb"></a-asset-item>
+ <!-- CAPYBARA -->
+ <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
-<!-- LIGHTING -->
+<!-- LIGHT -->
 <a-entity light="type:ambient;intensity:0.7"></a-entity>
 <a-entity light="type:directional;intensity:1.2" position="0 3 2"></a-entity>
 
 <a-marker preset="hiro">
 
-<!-- SOFT SHADOW -->
+<!-- SHADOW -->
 <a-plane rotation="-90 0 0" width="2.6" height="2.6"
  material="color:#000;opacity:0.35"></a-plane>
 
 <!-- TEXT + GLASS PANEL -->
 <a-entity id="textGroup" position="0 2.1 0" look-at="[camera]">
 
- <!-- GLASS BACK -->
  <a-plane width="2.6" height="1.1"
-  material="color:#111;opacity:0.55;transparent:true"
-  position="0 0 0"></a-plane>
+  material="color:#111;opacity:0.55;transparent:true"></a-plane>
 
- <!-- TITLE -->
  <a-entity id="titleText"
   text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.22; height:0.04"
   material="color:#ffffff"
   position="-1.2 0.25 0.02"></a-entity>
 
- <!-- DESC -->
  <a-entity id="descText"
   text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_regular.typeface.json; size:0.12; height:0.03"
   material="color:#cccccc"
   position="-1.2 -0.05 0.02"></a-entity>
 
- <!-- PRICE -->
  <a-entity id="priceText"
   text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.14; height:0.04"
   material="color:#e6c46f"
@@ -169,9 +164,8 @@ body{
 
 </a-entity>
 
-<!-- PASTA (ROTATES) -->
-<a-entity id="pastaHolder"
- position="0 0.6 0"
+<!-- PASTA ROTATES -->
+<a-entity position="0 0.6 0"
  animation="property:rotation;to:0 360 0;loop:true;dur:16000">
 
  <a-entity id="pasta"
@@ -181,8 +175,8 @@ body{
 
 </a-entity>
 
-<!-- CAPY (ANIMATES) -->
-<a-entity id="capyHolder" position="0 0.6 0">
+<!-- CAPYBARA ANIMATES -->
+<a-entity position="0 0.6 0">
 
  <a-entity id="capy"
   gltf-model="#capyModel"
