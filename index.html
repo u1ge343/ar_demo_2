@@ -25,6 +25,7 @@ body{
  font-family:sans-serif;
 }
 
+/* LOADER */
 #loader{
  position:fixed;
  inset:0;
@@ -123,11 +124,7 @@ body{
 <a-scene embedded arjs="sourceType:webcam;debugUIEnabled:false">
 
 <a-assets>
- <!-- PASTA -->
- <a-asset-item id="pastaModel"
- src="assets/a.glb"></a-asset-item>
-
- <!-- CAPYBARA -->
+ <a-asset-item id="pastaModel" src="assets/a.glb"></a-asset-item>
  <a-asset-item id="capyModel" src="assets/jb.glb"></a-asset-item>
 </a-assets>
 
@@ -138,44 +135,59 @@ body{
 <a-marker preset="hiro">
 
 <!-- SHADOW -->
-<a-plane rotation="-90 0 0" width="2.6" height="2.6"
+<a-plane rotation="-90 0 0"
+ width="3.2" height="3.2"
  material="color:#000;opacity:0.35"></a-plane>
 
 <!-- 3D TEXT -->
-<a-entity id="textGroup" position="0 2.1 0" look-at="[camera]">
+<a-entity id="textGroup" position="0 2.5 0" look-at="[camera]">
 
  <a-entity id="titleText"
-  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.22; height:0.04"
+  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.24; height:0.04"
   material="color:#ffffff"
-  position="-1.2 0.25 0.02"></a-entity>
+  position="-1.4 0.3 0"></a-entity>
 
  <a-entity id="descText"
-  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_regular.typeface.json; size:0.12; height:0.03"
+  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_regular.typeface.json; size:0.13; height:0.03"
   material="color:#cccccc"
-  position="-1.2 -0.05 0.02"></a-entity>
+  position="-1.4 0.05 0"></a-entity>
 
  <a-entity id="priceText"
-  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.14; height:0.04"
+  text-geometry="value: ; font:https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_bold.typeface.json; size:0.15; height:0.04"
   material="color:#e6c46f"
-  position="-1.2 -0.35 0.02"></a-entity>
+  position="-1.4 -0.25 0"></a-entity>
 
 </a-entity>
 
-<!-- PASTA (NO ROTATION) -->
-<a-entity position="0 0.6 0">
+<!-- ADD TO CART BUTTON -->
+<a-entity id="addBtn"
+ position="0 0.4 0"
+ look-at="[camera]"
+ geometry="primitive:plane;width:1.4;height:0.4"
+ material="color:#1f1f1f"
+ class="clickable">
+
+ <a-entity
+  text="value:Add to Cart;align:center;color:#ffffff;width:3"
+  position="0 0 0.01"></a-entity>
+
+</a-entity>
+
+<!-- PASTA -->
+<a-entity position="0 0.9 0">
  <a-entity id="pasta"
   gltf-model="#pastaModel"
   animation-mixer="clip:*;loop:repeat"
-  scale="8 8 8"
+  scale="24 24 24"
   visible="false"></a-entity>
 </a-entity>
 
-<!-- CAPYBARA (ANIMATES) -->
-<a-entity position="0 0.6 0">
+<!-- CAPYBARA -->
+<a-entity position="0 0.9 0">
  <a-entity id="capy"
   gltf-model="#capyModel"
   animation-mixer="clip:*;loop:repeat"
-  scale="5 5 5"
+  scale="15 15 15"
   visible="false"></a-entity>
 </a-entity>
 
@@ -191,6 +203,7 @@ const dishes=[
 ];
 
 let currentIndex=0;
+let cart=[];
 
 const overlay=document.getElementById("menuOverlay");
 const loader=document.getElementById("loader");
@@ -199,6 +212,8 @@ const bottomBar=document.getElementById("bottomBar");
 const titleText=document.getElementById("titleText");
 const descText=document.getElementById("descText");
 const priceText=document.getElementById("priceText");
+
+const addBtn=document.getElementById("addBtn");
 
 function hideAll(){
  document.getElementById("pasta").setAttribute("visible","false");
@@ -246,6 +261,12 @@ function nextDish(){
  if(i>=dishes.length) i=0;
  showDish(i);
 }
+
+/* ADD TO CART */
+addBtn.addEventListener("click",()=>{
+ cart.push(dishes[currentIndex]);
+ alert(dishes[currentIndex].name+" added to cart");
+});
 </script>
 
 </body>
