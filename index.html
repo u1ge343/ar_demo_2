@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>AR Menu</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Disable Zoom -->
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
 
 <!-- A-Frame -->
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
@@ -23,18 +29,7 @@ body{
  background:black;
  overflow:hidden;
  font-family:sans-serif;
-}
-
-/* LOADER */
-#loader{
- position:fixed;
- inset:0;
- background:rgba(0,0,0,.85);
- display:none;
- align-items:center;
- justify-content:center;
- color:white;
- z-index:20;
+ touch-action: none;
 }
 
 /* MENU */
@@ -92,8 +87,6 @@ body{
 </head>
 
 <body>
-
-<div id="loader">Loading model...</div>
 
 <!-- MENU -->
 <div id="menuOverlay">
@@ -159,13 +152,12 @@ body{
 
 </a-entity>
 
-<!-- ADD TO CART BUTTON -->
+<!-- ADD TO CART -->
 <a-entity id="addBtn"
  position="0 0.4 0"
  look-at="[camera]"
  geometry="primitive:plane;width:1.4;height:0.4"
- material="color:#1f1f1f"
- class="clickable">
+ material="color:#1f1f1f">
 
  <a-entity
   text="value:Add to Cart;align:center;color:#ffffff;width:3"
@@ -191,7 +183,6 @@ body{
   scale="5 5 5"
   visible="false"></a-entity>
 </a-entity>
-</a-entity>
 
 </a-marker>
 
@@ -208,7 +199,6 @@ let currentIndex=0;
 let cart=[];
 
 const overlay=document.getElementById("menuOverlay");
-const loader=document.getElementById("loader");
 const bottomBar=document.getElementById("bottomBar");
 
 const titleText=document.getElementById("titleText");
@@ -229,18 +219,14 @@ function update3DText(i){
 }
 
 function showDish(i){
- loader.style.display="flex";
  hideAll();
  currentIndex=i;
 
  const model=document.getElementById(dishes[i].id);
 
- model.addEventListener("model-loaded",()=>{
-   loader.style.display="none";
-   if(model.hasAttribute("animation-mixer")){
-     model.components["animation-mixer"].play();
-   }
- },{once:true});
+ if(model.hasAttribute("animation-mixer")){
+  model.components["animation-mixer"]?.play();
+ }
 
  model.setAttribute("visible","true");
  update3DText(i);
